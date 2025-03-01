@@ -9,7 +9,10 @@
 git clone https://github.com/ArtyomBina/Moon.git
 ```
 
-1. Откройте файл ```src/main.cpp```
+1. Откройте файл [```src/main.cpp```](src/main.cpp)
+
+1.1 Если не знакомы с байт кодом Moon то [почитайте это](docs/bytecode.md)
+
 2. Напишите необходимый вам байт код согласно примеру:
 ```cpp
 #include "vm.h"
