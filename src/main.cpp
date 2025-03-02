@@ -6,11 +6,21 @@
 
 int main() {
     std::vector<std::variant<int, std::string>> program = {
-        PUSH, 10,
-        PUSH, 3,
-        MOD,       // 10 % 3 = 1
-        PRINT,     // Выведет 1
-        HALT
+        LABEL, std::string("start"),
+            PUSH, 1,
+            PUSH, 9,
+            CMP_EQ, std::string("if_block"),
+            JUMP, std::string("else_block"),
+
+        LABEL, std::string("if_block"),
+            PUSH, 4,
+            PRINT,
+            JUMP, std::string("end"),
+        LABEL, std::string("else_block"),
+            PUSH, 18,
+            PRINT,
+        LABEL, std::string("end"),
+            HALT
     };
 
 
