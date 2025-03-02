@@ -38,4 +38,6 @@
 #define OR           28
 #define NOT          29
 
+#define MOD          30
+
 #endif // OPCODE_IDS_H

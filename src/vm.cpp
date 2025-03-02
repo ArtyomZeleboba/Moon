@@ -16,7 +16,7 @@ namespace {
         {JUMP, 1}, {JUMPIZ, 1}, {JUMPINZ, 1}, {LABEL, 1},
         {JUMP_RET, 1}, {JUMPIZ_RET, 1}, {JUMPINZ_RET, 1},
         {DUP, 0}, {SWAP, 0}, {CMP_EQ, 1}, {CMP_NE, 1},
-        {CMP_GT, 1}, {CMP_LT, 1}, {AND, 0}, {OR, 0}, {NOT, 0}
+        {CMP_GT, 1}, {CMP_LT, 1}, {AND, 0}, {OR, 0}, {NOT, 0}, {MOD, 0}
     };
 }
 
@@ -169,6 +169,8 @@ void VM::execute(std::vector<std::variant<int, std::string>>& program) {
                 mul(stack);
             } else if (command == DIV) {
                 div(stack);
+            } else if (command == MOD) {
+                mod(stack);
             } else if (command == PRINT) {
                 if (stack.empty()) {
                     throw std::runtime_error("Stack error: stack is empty for PRINT");

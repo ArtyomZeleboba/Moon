@@ -38,3 +38,13 @@ void div(std::stack<int>& stack) {
     }
     stack.push(a / b);                 // Результат
 }
+
+void mod(std::stack<int>& stack) {
+    if (stack.size() < 2) {
+        throw std::runtime_error("Stack error: two operands missing for this operation(MOD)");
+    }
+    int b = stack.top(); stack.pop();  // Второй операнд
+    int a = stack.top(); stack.pop();  // Первый операнд
+
+    stack.push(a % b);                 // Результат
+}

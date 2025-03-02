@@ -6,19 +6,11 @@
 
 int main() {
     std::vector<std::variant<int, std::string>> program = {
-        LABEL, std::string("start"),
-            PUSH, 0,          // Инициализация переменной i
-        LABEL, std::string("loop"),
-            DUP,              // Дублируем i
-            PUSH, 10,
-            CMP_LT, std::string("body"),   // Если i < 10, переходим к телу цикла
-            HALT,
-        LABEL, std::string("body"),
-            DUP,
-            PRINT,            // Выводим i
-            PUSH, 1,
-            ADD,              // Увеличиваем i на 1
-            JUMP, std::string("loop"),     // Переход к началу цикла
+        PUSH, 10,
+        PUSH, 3,
+        MOD,       // 10 % 3 = 1
+        PRINT,     // Выведет 1
+        HALT
     };
 
 
