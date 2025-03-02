@@ -2,23 +2,23 @@
 #include "opcode_ids.h"
 #include <vector>
 
+//Читай примеры байт-кода в Examples/
+
 int main() {
     std::vector<std::variant<int, std::string>> program = {
-        LABEL, std::string(".cmp_eq"),
-            PUSH, 1,
-            PUSH, 3,
-            SWAP,
-            PRINT,
-            PRINT,
-            JUMP, std::string("end"),
-        
         LABEL, std::string("start"),
-            PUSH, 120,
-            PUSH, 120,
-            CMP_GT, std::string(".cmp_eq"),
-        
-        LABEL, std::string("end"),
-            HALT
+            PUSH, 0,          // Инициализация переменной i
+        LABEL, std::string("loop"),
+            DUP,              // Дублируем i
+            PUSH, 10,
+            CMP_LT, std::string("body"),   // Если i < 10, переходим к телу цикла
+            HALT,
+        LABEL, std::string("body"),
+            DUP,
+            PRINT,            // Выводим i
+            PUSH, 1,
+            ADD,              // Увеличиваем i на 1
+            JUMP, std::string("loop"),     // Переход к началу цикла
     };
 
 

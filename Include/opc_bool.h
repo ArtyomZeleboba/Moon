@@ -13,8 +13,8 @@ void cmp_ne(std::stack<int>& stack, size_t& pc, std::vector<std::variant<int, st
 void cmp_gt(std::stack<int>& stack, size_t& pc, std::vector<std::variant<int, std::string>>& program, std::map<int, size_t>& lineToIndex);
 void cmp_lt(std::stack<int>& stack, size_t& pc, std::vector<std::variant<int, std::string>>& program, std::map<int, size_t>& lineToIndex);
 
-void and(std::stack<int>& stack);
-void or(std::stack<int>& stack);
+void _and(std::stack<int>& stack);
+void _or(std::stack<int>& stack);
 void _not(std::stack<int>& stack);
 
 #endif//OPC_BOOL_H

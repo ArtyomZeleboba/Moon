@@ -1,6 +1,6 @@
 #include "opc_bool.h"
 
-void and(std::stack<int>& stack) {
+void _and(std::stack<int>& stack) {
     if (stack.size() < 2) {
         throw std::runtime_error("Stack error: two operands missing for AND");
     }
@@ -8,7 +8,7 @@ void and(std::stack<int>& stack) {
     int a = stack.top(); stack.pop();
     stack.push(a && b ? 1 : 0);  // 1, если оба истинны, иначе 0  
 }
-void or(std::stack<int>& stack) {
+void _or(std::stack<int>& stack) {
     if (stack.size() < 2) {
         throw std::runtime_error("Stack error: two operands missing for OR");
     }

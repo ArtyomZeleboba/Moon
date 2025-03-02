@@ -219,9 +219,9 @@ void VM::execute(std::vector<std::variant<int, std::string>>& program) {
             } else if (command == CMP_LT) {
                 cmp_lt(stack, pc, program, lineToIndex);
             } else if (command == AND) {
-                and(stack);
+                _and(stack);
             } else if (command == OR) {
-                or(stack);
+                _or(stack);
             } else if (command == NOT) {
                 _not(stack);
             } else if (command == HALT) {
