@@ -1,30 +1,25 @@
-#include "vm.h"
-#include "opcode_ids.h"
+#include "vm.hpp"
+#include "opcode_ids.hpp"
 #include <vector>
 
-//Читай примеры байт-кода в Examples/
-
 int main() {
-    std::vector<std::variant<int, std::string>> program = {
-        LABEL, std::string("start"),
-            PUSH, 1,
-            PUSH, 9,
-            CMP_EQ, std::string("if_block"),
-            JUMP, std::string("else_block"),
+    VM vm;
 
-        LABEL, std::string("if_block"),
-            PUSH, 4,
-            PRINT,
-            JUMP, std::string("end"),
-        LABEL, std::string("else_block"),
-            PUSH, 18,
-            PRINT,
-        LABEL, std::string("end"),
-            HALT
+    // Байт-код для теста: (2 + 3) * (5 - 1) / 2
+    std::vector<std::variant<int, std::string>> program = {
+        PUSH, 2,
+        PUSH, 3,
+        ADD,
+        PUSH, 5,
+        PUSH, 1,
+        SUB,
+        MUL,
+        PUSH, 2,
+        DIV,
+        PRINT,
+        HALT
     };
 
-
-    VM vm;
     vm.execute(program);
 
     return 0;

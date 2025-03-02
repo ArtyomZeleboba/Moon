@@ -1,11 +1,11 @@
-#include "opcode_ids.h"
-#include "arithmetic_operations.h"
-#include "jump_operations.h"
-#include "memory.h"
-#include "stack.h"
-#include "opc_bool.h"
+#include "opcode_ids.hpp"
+#include "arithmetic_operations.hpp"
+#include "jump_operations.hpp"
+#include "memory.hpp"
+#include "stack.hpp"
+#include "opc_bool.hpp"
 
-#include "vm.h"
+#include "vm.hpp"
 
 //База хранящая информацию есть ли у опкода аргумент или нет
 namespace {
@@ -20,7 +20,7 @@ namespace {
     };
 }
 
-std::map<int, size_t> createLineToIndexMapping(const std::vector<std::variant<int, std::string>>& program) {
+std::map<int, size_t> VM::createLineToIndexMapping(const std::vector<std::variant<int, std::string>>& program) const  {
     std::map<int, size_t> lineToIndex;
     size_t index = 0;
     int lineNumber = 1;
@@ -46,11 +46,11 @@ std::map<int, size_t> createLineToIndexMapping(const std::vector<std::variant<in
     return lineToIndex; //Возвращаем карту областей с индексами
 }
 
-void VM::analyze_Labels(std::vector<std::variant<int, std::string>>& program) {
+void VM::analyzeLabels(std::vector<std::variant<int, std::string>>& program) {
     size_t index = 0;
     int current_line = 1;
     int count_labels = 0;
-    std::map<int, size_t> lineToIndex = createLineToIndexMapping(program);
+    std::map<int, size_t> lineToIndex = this->createLineToIndexMapping(program);
     std::vector<std::variant<int, std::string>> result_programm;
 
     while (index < program.size()) {
@@ -133,7 +133,7 @@ void VM::analyze_Labels(std::vector<std::variant<int, std::string>>& program) {
 
     // Обновление программы и PC
     program = std::move(final_programm);
-    lineToIndex = createLineToIndexMapping(program);
+    lineToIndex = this->createLineToIndexMapping(program);
     if (labels.find("start") == labels.end()) {
         pc = 0;
     } else {
@@ -141,100 +141,165 @@ void VM::analyze_Labels(std::vector<std::variant<int, std::string>>& program) {
     }
 }
 
+
+
+void VM::executeArithmeticOperation(int command, std::stack<int>& stack) {
+    switch (command) {
+        case ADD: add(stack); break;
+        case SUB: sub(stack); break;
+        case MUL: mul(stack); break;
+        case DIV: div(stack); break;
+        case MOD: mod(stack); break;
+        default:
+            throw std::runtime_error("Unknown arithmetic operation: " + std::to_string(command));
+    }
+}
+
+void VM::executeJumpOperation(int command, std::vector<std::variant<int, std::string>>& program, size_t& pc, const std::map<int, size_t>& lineToIndex, std::stack<int>& stack) {
+    switch (command) {
+        case JUMP: jump(program, pc, lineToIndex); break;
+        case JUMPIZ: jumpiz(program, pc, stack, lineToIndex); break;
+        case JUMPINZ: jumpinz(program, pc, stack, lineToIndex); break;
+        case JUMP_RET: lastPC.push(pc); jump(program, pc, lineToIndex); break;
+        case JUMPIZ_RET: lastPC.push(pc); jumpiz(program, pc, stack, lineToIndex); break;
+        case JUMPINZ_RET: lastPC.push(pc); jumpinz(program, pc, stack, lineToIndex); break;
+        default:
+            throw std::runtime_error("Unknown jump operation: " + std::to_string(command));
+    }
+}
+
+void VM::executeMemoryOperation(int command, std::vector<std::variant<int, std::string>>& program, size_t& pc, std::stack<int>& stack, std::map<int, std::vector<int>>& memory, int& nextAddress) {
+    switch (command) {
+        case STORE_GLOBAL: {
+            int address = std::get<int>(program[++pc]);
+            int value = stack.top(); stack.pop();
+            globalsV[address] = value;
+            break;
+        }
+        case LOAD_GLOBAL: {
+            int address = std::get<int>(program[++pc]);
+            if (globalsV.find(address) == globalsV.end()) {
+                throw std::runtime_error("[LOAD GLOBAL] Global variable not found");
+            }
+            stack.push(globalsV[address]);
+            break;
+        }
+        case ALLOC: alloc(stack, memory, nextAddress); break;
+        case STORE_MEM: store_mem(stack, memory); break;
+        case LOAD_MEM: load_mem(stack, memory); break;
+        case FREE: free(stack, memory); break;
+        default:
+            throw std::runtime_error("Unknown memory operation: " + std::to_string(command));
+    }
+}
+
+void VM::executeStackOperation(int command, std::stack<int>& stack) {
+    switch (command) {
+        case POP: pop(stack); break;
+        case DUP: dup(stack); break;
+        case SWAP: swap(stack); break;
+        case PRINT: {
+            if (stack.empty()) {
+                throw std::runtime_error("Stack error: stack is empty for PRINT");
+            }
+            std::cout << stack.top() << std::endl;
+            stack.pop();
+            break;
+        }
+        default:
+            throw std::runtime_error("Unknown stack operation: " + std::to_string(command));
+    }
+}
+
+void VM::executeComparisonOperation(int command, std::stack<int>& stack, size_t& pc, std::vector<std::variant<int, std::string>>& program, const std::map<int, size_t>& lineToIndex) {
+    switch (command) {
+        case CMP_EQ: cmp_eq(stack, pc, program, lineToIndex); break;
+        case CMP_NE: cmp_ne(stack, pc, program, lineToIndex); break;
+        case CMP_GT: cmp_gt(stack, pc, program, lineToIndex); break;
+        case CMP_LT: cmp_lt(stack, pc, program, lineToIndex); break;
+        default:
+            throw std::runtime_error("Unknown comparison operation: " + std::to_string(command));
+    }
+}
+
+void VM::executeLogicalOperation(int command, std::stack<int>& stack) {
+    switch (command) {
+        case AND: _and(stack); break;
+        case OR: _or(stack); break;
+        case NOT: _not(stack); break;
+        default:
+            throw std::runtime_error("Unknown logical operation: " + std::to_string(command));
+    }
+}
+
 void VM::execute(std::vector<std::variant<int, std::string>>& program) {
-    this->analyze_Labels(program);
+    this->analyzeLabels(program);
     std::map<int, size_t> lineToIndex = createLineToIndexMapping(program);
 
     while (pc < program.size()) {
         const auto& instruction = program[pc];
-    
 
-        // Проверяем, является ли instruction числом (командой)
-        if (std::holds_alternative<int>(instruction)) {
-            int command = std::get<int>(instruction);
-
-            if (command == PUSH) {
-                push(program, pc, stack);
-            } else if (command == POP) {
-                pop(stack);
-            } else if (command == DUP) {
-                dup(stack);
-            } else if (command == SWAP) {
-                swap(stack);
-            } else if (command == ADD) {
-                add(stack);
-            } else if (command == SUB) {
-                sub(stack);
-            } else if (command == MUL) {
-                mul(stack);
-            } else if (command == DIV) {
-                div(stack);
-            } else if (command == MOD) {
-                mod(stack);
-            } else if (command == PRINT) {
-                if (stack.empty()) {
-                    throw std::runtime_error("Stack error: stack is empty for PRINT");
-                }
-                std::cout <<  stack.top() << std::endl;  // Вывод верхнего элемента
-                stack.pop();
-            } else if (command == STORE_GLOBAL) {
-                int address = std::get<int>(program[++pc]); // Получаем адрес для сохранения переменной
-                int value = stack.top(); stack.pop(); // Так как перед сохранением мы сделали push, то достаём из вершины стека
-                globalsV[address] = value; // В map сохраняем значение переменной
-                std::cout<<"f"<<globalsV[address]<<std::endl; 
-            } else if (command == LOAD_GLOBAL) {
-                int address = std::get<int>(program[++pc]); // Получаем адрес переменной
-                
-                if (globalsV.find(address) == globalsV.end()) {
-                    throw std::runtime_error("[LOAD GLOBAL] Global variable not found");
-                }
-                stack.push(globalsV[address]); // Помещаем в стек то, что вытащили
-            } else if (command == ALLOC) {
-                alloc(stack, memory, nextAddress);
-            } else if (command == STORE_MEM) {
-                store_mem(stack, memory);
-            } else if (command == LOAD_MEM) {
-                load_mem(stack, memory);
-            } else if (command == FREE) {
-                free(stack, memory);
-            } else if (command == JUMP) {
-                jump(program, pc, lineToIndex);
-            } else if (command == JUMPIZ) {
-                jumpiz(program, pc, stack, lineToIndex);
-            } else if (command == JUMPINZ) {
-                jumpinz(program, pc, stack, lineToIndex);
-            } else if (command == JUMP_RET) {
-                lastPC.push(pc);
-                jump(program, pc, lineToIndex);
-            } else if (command == JUMPIZ_RET) {
-                lastPC.push(pc);
-                jumpiz(program, pc, stack, lineToIndex);
-            } else if (command == JUMPINZ_RET) {
-                lastPC.push(pc);
-                jumpinz(program, pc, stack, lineToIndex);
-            } else if (command == CMP_EQ) {
-                cmp_eq(stack, pc, program, lineToIndex);
-            } else if (command == CMP_NE) {
-                cmp_ne(stack, pc, program, lineToIndex);
-            } else if (command == CMP_GT) {
-                cmp_gt(stack, pc, program, lineToIndex);
-            } else if (command == CMP_LT) {
-                cmp_lt(stack, pc, program, lineToIndex);
-            } else if (command == AND) {
-                _and(stack);
-            } else if (command == OR) {
-                _or(stack);
-            } else if (command == NOT) {
-                _not(stack);
-            } else if (command == HALT) {
-                return;  // Завершение программы
-            } else if (command == LABEL) {
-                pc += 2;
-            } else {
-                throw std::runtime_error("Unknown instruction");
-            }
-        } else {
+        if (!std::holds_alternative<int>(instruction)) {
             throw std::runtime_error("Expected command but found a string");
+        }
+
+        int command = std::get<int>(instruction);
+
+        try {
+            switch (command) {
+                case PUSH:
+                    push(program, pc, stack);
+                    break;
+                case POP:
+                case DUP:
+                case SWAP:
+                case PRINT:
+                    executeStackOperation(command, stack);
+                    break;
+                case ADD:
+                case SUB:
+                case MUL:
+                case DIV:
+                case MOD:
+                    executeArithmeticOperation(command, stack);
+                    break;
+                case STORE_GLOBAL:
+                case LOAD_GLOBAL:
+                case ALLOC:
+                case STORE_MEM:
+                case LOAD_MEM:
+                case FREE:
+                    executeMemoryOperation(command, program, pc, stack, memory, nextAddress);
+                    break;
+                case JUMP:
+                case JUMPIZ:
+                case JUMPINZ:
+                case JUMP_RET:
+                case JUMPIZ_RET:
+                case JUMPINZ_RET:
+                    executeJumpOperation(command, program, pc, lineToIndex, stack);
+                    break;
+                case CMP_EQ:
+                case CMP_NE:
+                case CMP_GT:
+                case CMP_LT:
+                    executeComparisonOperation(command, stack, pc, program, lineToIndex);
+                    break;
+                case AND:
+                case OR:
+                case NOT:
+                    executeLogicalOperation(command, stack);
+                    break;
+                case HALT:
+                    return;  // Завершение программы
+                case LABEL:
+                    pc += 2;  // Пропускаем метку и её аргумент
+                    break;
+                default:
+                    throw std::runtime_error("Unknown command: " + std::to_string(command));
+            }
+        } catch (const std::exception& e) {
+            throw std::runtime_error("Error at line " + std::to_string(pc) + ": " + e.what());
         }
 
         pc++;  // Переход к следующей команде
@@ -247,6 +312,3 @@ void VM::execute(std::vector<std::variant<int, std::string>>& program) {
         this->execute(program);
     }
 }
-
-
-

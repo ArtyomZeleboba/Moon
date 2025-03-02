@@ -1,4 +1,4 @@
-#include "memory.h"
+#include "memory.hpp"
 
 void alloc(std::stack<int>& stack, std::map<int, std::vector<int>>& memory, int& nextAddress) {
     int size = stack.top(); stack.pop();

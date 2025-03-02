@@ -1,4 +1,4 @@
-#include "stack.h"
+#include "stack.hpp"
 
 void push(std::vector<std::variant<int, std::string>>& program, size_t& pc, std::stack<int>& stack) {
     int operand = std::get<int>(program[++pc]);  // Получаем значение

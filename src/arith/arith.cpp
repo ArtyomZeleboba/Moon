@@ -1,4 +1,4 @@
-#include "arithmetic_operations.h"
+#include "arithmetic_operations.hpp"
 
 void add(std::stack<int>& stack) {
     if (stack.size() < 2) {

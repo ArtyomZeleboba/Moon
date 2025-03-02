@@ -1,6 +1,6 @@
-#include "opc_bool.h"
+#include "opc_bool.hpp"
 
-void cmp_eq(std::stack<int>& stack, size_t& pc, std::vector<std::variant<int, std::string>>& program, std::map<int, size_t>& lineToIndex) {
+void cmp_eq(std::stack<int>& stack, size_t& pc, std::vector<std::variant<int, std::string>>& program, const std::map<int, size_t>& lineToIndex) {
     if (stack.size() < 2) {
         throw std::runtime_error("Stack error: two operands missing for CMP_EQ");
     }
@@ -17,7 +17,7 @@ void cmp_eq(std::stack<int>& stack, size_t& pc, std::vector<std::variant<int, st
         pc = lineToIndex.at(lineNumber) - 1;
 }
 
-void cmp_ne(std::stack<int>& stack, size_t& pc, std::vector<std::variant<int, std::string>>& program, std::map<int, size_t>& lineToIndex) {
+void cmp_ne(std::stack<int>& stack, size_t& pc, std::vector<std::variant<int, std::string>>& program, const std::map<int, size_t>& lineToIndex) {
     if (stack.size() < 2) {
         throw std::runtime_error("Stack error: two operands missing for CMP_EQ");
     }
@@ -34,7 +34,7 @@ void cmp_ne(std::stack<int>& stack, size_t& pc, std::vector<std::variant<int, st
         pc = lineToIndex.at(lineNumber) - 1;
 }
 
-void cmp_gt(std::stack<int>& stack, size_t& pc, std::vector<std::variant<int, std::string>>& program, std::map<int, size_t>& lineToIndex) {
+void cmp_gt(std::stack<int>& stack, size_t& pc, std::vector<std::variant<int, std::string>>& program, const std::map<int, size_t>& lineToIndex) {
     if (stack.size() < 2) {
         throw std::runtime_error("Stack error: two operands missing for CMP_EQ");
     }
@@ -51,7 +51,7 @@ void cmp_gt(std::stack<int>& stack, size_t& pc, std::vector<std::variant<int, st
         pc = lineToIndex.at(lineNumber) - 1;
 }
 
-void cmp_lt(std::stack<int>& stack, size_t& pc, std::vector<std::variant<int, std::string>>& program, std::map<int, size_t>& lineToIndex) {
+void cmp_lt(std::stack<int>& stack, size_t& pc, std::vector<std::variant<int, std::string>>& program, const std::map<int, size_t>& lineToIndex) {
     if (stack.size() < 2) {
         throw std::runtime_error("Stack error: two operands missing for CMP_EQ");
     }

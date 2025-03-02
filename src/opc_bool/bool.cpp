@@ -1,4 +1,4 @@
-#include "opc_bool.h"
+#include "opc_bool.hpp"
 
 void _and(std::stack<int>& stack) {
     if (stack.size() < 2) {

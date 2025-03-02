@@ -1,4 +1,4 @@
-#include "jump_operations.h"
+#include "jump_operations.hpp"
 
 void jump(std::vector<std::variant<int, std::string>>& program, size_t& pc, const std::map<int, size_t>& lineToIndex) {
     // Извлекаем номер строки для перехода
