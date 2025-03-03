@@ -22,7 +22,7 @@ int main() {
         LABEL, std::string("start"),
             PUSH, 2,
             PRINT,
-			 JUMP, std::string("end"),
+			      JUMP, std::string("end"),
 
         LABEL, std::string("end"),
             HALT

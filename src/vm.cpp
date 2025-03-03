@@ -16,7 +16,9 @@ namespace {
         {JUMP, 1}, {JUMPIZ, 1}, {JUMPINZ, 1}, {LABEL, 1},
         {JUMP_RET, 1}, {JUMPIZ_RET, 1}, {JUMPINZ_RET, 1},
         {DUP, 0}, {SWAP, 0}, {CMP_EQ, 1}, {CMP_NE, 1},
-        {CMP_GT, 1}, {CMP_LT, 1}, {AND, 0}, {OR, 0}, {NOT, 0}, {MOD, 0}
+        {CMP_GT, 1}, {CMP_LT, 1}, {AND, 0}, {OR, 0}, {NOT, 0}, {MOD, 0},
+        {INC, 0}, {DEC, 0}, {NEG, 0}, {ABS, 0}, {POW, 0}, {SQRT, 0}, 
+        {MIN, 0}, {MAX, 0}, {AVG, 0}, {RAND, 0}
     };
 }
 
@@ -150,6 +152,16 @@ void VM::executeArithmeticOperation(int command, std::stack<int>& stack) {
         case MUL: mul(stack); break;
         case DIV: div(stack); break;
         case MOD: mod(stack); break;
+        case INC: inc(stack); break;
+        case DEC: dec(stack); break;
+        case NEG: neg(stack); break;
+        case ABS: abs(stack); break;
+        case POW: pow(stack); break;
+        case SQRT: sqrt(stack); break;
+        case MIN: min(stack); break;
+        case MAX: max(stack); break;
+        case AVG: avg(stack); break;
+        case RAND: rand(stack); break;
         default:
             throw std::runtime_error("Unknown arithmetic operation: " + std::to_string(command));
     }
@@ -260,6 +272,16 @@ void VM::execute(std::vector<std::variant<int, std::string>>& program) {
                 case SUB:
                 case MUL:
                 case DIV:
+                case INC:
+                case DEC:
+                case NEG:
+                case ABS:
+                case POW:
+                case SQRT:
+                case MIN:
+                case MAX:
+                case AVG:
+                case RAND:
                 case MOD:
                     executeArithmeticOperation(command, stack);
                     break;

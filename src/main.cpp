@@ -7,15 +7,7 @@ int main() {
 
     // Байт-код для теста: (2 + 3) * (5 - 1) / 2
     std::vector<std::variant<int, std::string>> program = {
-        PUSH, 2,
-        PUSH, 3,
-        ADD,
-        PUSH, 5,
-        PUSH, 1,
-        SUB,
-        MUL,
-        PUSH, 2,
-        DIV,
+        RAND,
         PRINT,
         HALT
     };

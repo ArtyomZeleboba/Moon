@@ -39,5 +39,15 @@
 #define NOT          29
 
 #define MOD          30
+#define INC          31
+#define DEC          32
+#define NEG          33
+#define ABS          34
+#define POW          35
+#define SQRT         36
+#define MIN          37
+#define MAX          38
+#define AVG          39
+#define RAND         40
 
 #endif // OPCODE_IDS_H
